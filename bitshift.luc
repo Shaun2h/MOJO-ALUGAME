@@ -1,0 +1,27 @@
+module bitshift (
+    input in[3][8],
+    output out[8]
+  ) {
+  //io_dip[2] = alufn
+  // io_dip[1] = one number
+  // io_dip [0] = second number
+  //B[2:0] instead of B[4:0] like the lab, because max shift is only 7 bits so use up to 3 bits to represent
+  //this module will not output anything if there is no valid alufn0 and alufn1 combination (alufn1 = 1 alufn0=0)
+  //this is a selector module.
+    bitshiftrightwithsign signright(.in(in));
+    bitshiftright shiftright(.in(in));
+    bitshiftleft shiftleft(.in(in));
+  
+    always {
+    out = 00000000;
+    //out is placed higher up here because lower statements have priority.
+    //therefore, we can conclude that this module outputs 00000000 if there is no valid configuration request.
+    if(in[2][0] && in[2][1] == 1){
+    out = signright.out;
+    }
+    if(in[2][1] ==0){
+        if(in[2][0] ==1){out = shiftright.out;}
+        if(in[2][0] ==0){out = shiftleft.out;}
+    }
+  }
+}

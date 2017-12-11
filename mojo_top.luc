@@ -1,0 +1,156 @@
+module mojo_top (
+    input clk,              // 50MHz clock
+    input rst_n,            // reset button (active low)
+    output led [8],         // 8 user controllable LEDs
+    input cclk,             // configuration clock, AVR ready when high
+    output spi_miso,        // AVR SPI MISO
+    input spi_ss,           // AVR SPI Slave Select
+    input spi_mosi,         // AVR SPI MOSI
+    input spi_sck,          // AVR SPI Clock
+    output spi_channel [4], // AVR general purpose pins (used by default to select ADC channel)
+    input avr_tx,           // AVR TX (FPGA RX)
+    output avr_rx,          // AVR RX (FPGA TX)
+    input avr_rx_busy,       // AVR RX buffer full
+    output matrix[16],
+    input typeselect[4],
+    output ledtype[4],
+    input matrixselect[16]
+  ) {
+  sig chosenmatrix[4]; //transfers the chosen location into next module.
+  sig rst;                  // reset signal 
+  .clk(clk) {
+    // The reset conditioner is used to synchronize the reset signal to the FPGA
+    // clock. This ensures the entire FPGA comes out of reset at the same time.
+    reset_conditioner reset_cond;
+    impactlogic do(.rst(rst));
+    edge_detector xnorselectedge(#RISE(1), #FALL(0));
+    edge_detector xorselectedge(#RISE(1), #FALL(0));
+    edge_detector notselectedge(#RISE(1), #FALL(0));
+    edge_detector nandselectedge(#RISE(1), #FALL(0));
+    
+    button_conditioner typexnorselect;
+    button_conditioner typexorselect;
+    button_conditioner typenotselect;
+    button_conditioner typenandselect;
+   
+    button_conditioner mat0;    
+    button_conditioner mat1;
+    button_conditioner mat2;
+    button_conditioner mat3;
+    
+    button_conditioner mat4;
+    button_conditioner mat5;
+    button_conditioner mat6;
+    button_conditioner mat7;
+    
+    button_conditioner mat8;
+    button_conditioner mat9;
+    button_conditioner mat10;
+    button_conditioner mat11;
+    
+    button_conditioner mat12;
+    button_conditioner mat13;
+    button_conditioner mat14;
+    button_conditioner mat15;
+    
+    edge_detector ma0(#RISE(1), #FALL(0));
+    edge_detector ma1(#RISE(1), #FALL(0));
+    edge_detector ma2(#RISE(1), #FALL(0));
+    edge_detector ma3(#RISE(1), #FALL(0));
+    edge_detector ma4(#RISE(1), #FALL(0));
+    edge_detector ma5(#RISE(1), #FALL(0));
+    edge_detector ma6(#RISE(1), #FALL(0));
+    edge_detector ma7(#RISE(1), #FALL(0));
+    edge_detector ma8(#RISE(1), #FALL(0));
+    edge_detector ma9(#RISE(1), #FALL(0));
+    edge_detector ma10(#RISE(1), #FALL(0));
+    edge_detector ma11(#RISE(1), #FALL(0));
+    edge_detector ma12(#RISE(1), #FALL(0));
+    edge_detector ma13(#RISE(1), #FALL(0));
+    edge_detector ma14(#RISE(1), #FALL(0));
+    edge_detector ma15(#RISE(1), #FALL(0));
+  }
+  
+  always {
+    reset_cond.in = ~rst_n; // input raw inverted reset signal
+    rst = reset_cond.out;   // conditioned reset
+    do.typechangepress=0;
+    do.xnormake=0;
+    do.xormake=0;
+    do.nandmake=0;
+    do.notmake=0;
+    led = 8h00;             // turn LEDs off
+    spi_miso = bz;          // not using SPI
+    spi_channel = bzzzz;    // not using flags
+    avr_rx = bz;            // not using serial port
+    matrix = do.matrixoutput;
+    typexnorselect.in = typeselect[0];
+    typexorselect.in = typeselect[1];
+    typenotselect.in = typeselect[2];
+    typenandselect.in = typeselect[3];
+    chosenmatrix = 4b0; //default nothing is selected. especially when not in game.
+    do.matrixdo =0; //default nothing is selected.
+    do.matrixselection = chosenmatrix;
+    xnorselectedge.in = typexnorselect.out;
+    xorselectedge.in = typexorselect.out;
+    notselectedge.in = typenotselect.out;
+    nandselectedge.in = typenandselect.out;
+    if(xnorselectedge.out){do.typechangepress=1; do.xnormake=1;}
+    if(xorselectedge.out){do.typechangepress=1;do.xormake=1;}
+    if(notselectedge.out){do.typechangepress=1;do.notmake=1;}
+    if(nandselectedge.out){do.typechangepress=1;do.nandmake=1;}
+    
+    ledtype[0]=do.isxnor; 
+    ledtype[1]=do.isxor;  //consistently output the type of game being played.
+    ledtype[2]=do.isnot; 
+    ledtype[3]=do.isnand; 
+    mat0.in = matrixselect[0];
+    ma0.in = mat0.out;
+    if(ma0.out){do.matrixselection=4b0000; do.matrixdo=1;}
+    mat1.in = matrixselect[1];
+    ma1.in = mat1.out;
+    if(ma1.out){do.matrixselection=4b0001; do.matrixdo=1;}
+    mat2.in = matrixselect[2];
+    ma2.in = mat2.out;
+    if(ma2.out){do.matrixselection=4b0010; do.matrixdo=1;}
+    mat3.in = matrixselect[3];
+    ma3.in = mat3.out;
+    if(ma3.out){do.matrixselection=4b0011; do.matrixdo=1;}
+    mat4.in = matrixselect[4];
+    ma4.in = mat4.out;
+    if(ma4.out){do.matrixselection=4b0100; do.matrixdo=1;}
+    mat5.in = matrixselect[5];
+    ma5.in = mat5.out;
+    if(ma5.out){do.matrixselection=4b0101; do.matrixdo=1;}
+    mat6.in = matrixselect[6];
+    ma6.in = mat6.out;
+    if(ma6.out){do.matrixselection=4b0110; do.matrixdo=1;}
+    mat7.in = matrixselect[7];
+    ma7.in = mat7.out;
+    if(ma7.out){do.matrixselection=4b0111; do.matrixdo=1;}
+    mat8.in = matrixselect[8];
+    ma8.in = mat8.out;
+    if(ma8.out){do.matrixselection=4b1000; do.matrixdo=1;}
+    mat9.in = matrixselect[9];
+    ma9.in = mat9.out;
+    if(ma9.out){do.matrixselection=4b1001; do.matrixdo=1;}
+    mat10.in = matrixselect[10];
+    ma10.in = mat10.out;
+    if(ma10.out){do.matrixselection=4b1010; do.matrixdo=1;}
+    mat11.in = matrixselect[11];
+    ma11.in = mat11.out;
+    if(ma11.out){do.matrixselection=4b1011; do.matrixdo=1;}
+    mat12.in = matrixselect[12];
+    ma12.in = mat12.out;
+    if(ma12.out){do.matrixselection=4b1100; do.matrixdo=1;}
+    mat13.in = matrixselect[13];
+    ma13.in = mat13.out;
+    if(ma13.out){do.matrixselection=4b1101; do.matrixdo=1;}
+    mat14.in = matrixselect[14];
+    ma14.in = mat14.out;
+    if(ma14.out){do.matrixselection=4b1110; do.matrixdo=1;}
+    mat15.in = matrixselect[15];
+    ma15.in = mat15.out;
+    if(ma15.out){do.matrixselection=4b1111; do.matrixdo=1;}
+      }
+  }

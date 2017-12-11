@@ -1,0 +1,47 @@
+module alumod (
+    input inne[3][8],
+    output out[8]
+  ) {
+  boolean boolme(.in(inne));
+  totaladder adderorsubtractor(.in(inne));
+  comparator comparer(.vin(adderorsubtractor.vout), .zin(adderorsubtractor.zout), .nin(adderorsubtractor.nout), .in(inne));
+  bitshift shiftbits(.in(inne));
+  multiplier multiplime(.in(inne));
+  always {
+    case(inne[2][5:0]){
+    
+    //IF ADDER, 000000 is input
+    6b000000: out = adderorsubtractor.answer;
+    //IF SUBTRACTOR, 000001 is input
+    6b000001: out = adderorsubtractor.answer;
+    //IF REQUESTED EQUAL 110011 is input
+    6b110011: out = comparer.comparisonresult;
+    //IF REQUESTED LESSER THEN 110101 is input
+    6b110101:out = comparer.comparisonresult;
+    //IF REQUESTED LESSER THEN OR EQUALS TO, THEN 110111 is input
+    6b110111:out = comparer.comparisonresult;  
+    //IF use AND THEN 011000 is input
+    6b011000:out = boolme.out;  
+    //IF use OR THEN 011110 is input
+    6b011110:out = boolme.out;      
+    //IF use XOR THEN 010110 is input
+    6b010110:out = boolme.out;            
+    //IF use SHL THEN 100000 is input
+    6b100000:out = shiftbits.out;            
+    //IF use SHR THEN 100001 is input
+    6b100001:out = shiftbits.out;            
+    //IF use SRA THEN 100011 is input
+    6b100011:out = shiftbits.out;            
+    //IF use multiplier THEN 001111
+    6b011010:out = inne[0];
+      
+    6b001111:out = multiplime.answer;
+    //DEFAULT is when it matches with no other statements above. So, alufn ERROR.
+    default:out = 00000000;
+    
+    }
+    //If comparator, looks at alufn1 and 2 for inputs, but requires 110
+
+
+  }
+}

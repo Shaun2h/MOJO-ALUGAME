@@ -1,0 +1,12 @@
+module multiplier (
+    input in[3][8],
+    output answer[8]
+  ) {
+  //io_dip[2] = alufn
+  // io_dip[1] = first number
+  // io_dip [0] = second number
+  always {
+    answer = in[1] * in[0];
+    
+  }
+}

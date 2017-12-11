@@ -1,0 +1,21 @@
+module adder (
+    input binaryone[1],
+    //first binary input (1 bit)
+    input binarytwo[1],
+    //second binary input (1 bit)
+    input carryin[1],
+    //carry in input (1 bit)
+    output carryout[1],
+    //carry output (1 bit)
+    output sumout[1]
+    //sum output (1 bit)
+    )
+   {
+
+  always {
+    carryout = (binaryone ^ binarytwo) & carryin | binaryone & binarytwo ;
+    //Carryout = ((binaryone XOR binarytwo) AND carryin) OR binaryone & binarytwo
+    sumout = (binaryone ^ binarytwo) ^carryin;
+    //Sum = (binaryone XOR binarytwo) XOR Carryin
+  }
+}

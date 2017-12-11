@@ -1,0 +1,31 @@
+module boolean (
+    input in[3][8],
+    //all inputs MUST be taken to compare all 8 bits accordingly.
+    output out[8]
+    //output is given as an 8 bit answer
+  ) {
+  //io_dip[2] = alufn
+  // io_dip[1] = first number
+  // io_dip [0] = second number  
+  //AND operator = (XOR all alufn) AND (Bit and Bit)
+  //OR operator = [(alufn3 AND alufn2) AND (alufn0 XOR alufn1)] AND (bit or bit)
+  //XOR operator = ([~alufn3 AND alufn2] AND (alufn1 and ~alufn0 ) ) AND (bit XOR bit)
+  //"A" operator = (alufn3 AND ~alufn2) AND (alufn1 and ~alufn0)) 
+  //noteworthy that A operator actually refers to load register... so it is not typed out below. until i find out what it is.
+  // All of the operators will output a 0 if it is either
+  // a) not to be considered for the requested logical operator
+  // b) not going to output true
+  // so you can utilise them all without worrying about clashes.
+  // Additionally, each alu requirement is very specific.
+  // should a logical operation have never been requested, it will always output 0x{8}. Afterwhich, it is up to the alu to select the correct output (not this output if logical operation not requested)
+  always {
+  out[7] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][7] & in[1][7]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][7] | in[1][7]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][7] ^ in[1][7]));
+  out[6] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][6] & in[1][6]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][6] | in[1][6]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][6] ^ in[1][6]));
+  out[5] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][5] & in[1][5]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][5] | in[1][5]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][5] ^ in[1][5]));
+  out[4] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][4] & in[1][4]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][4] | in[1][4]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][4] ^ in[1][4]));
+  out[3] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][3] & in[1][3]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][3] | in[1][3]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][3] ^ in[1][3]));
+  out[2] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][2] & in[1][2]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][2] | in[1][2]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][2] ^ in[1][2]));
+  out[1] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][1] & in[1][1]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][1] | in[1][1]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][1] ^ in[1][1]));
+  out[0] = (((in[2][3]^in[2][2]^in[2][1]^in[2][0]) & (in[0][0] & in[1][0]))) | ((in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0])) & (in[0][0] | in[1][0]) | (((~in[2][3] & in[2][2]) & (in[2][1] & ~in[2][0]))&(in[0][0] ^ in[1][0]));
+  }
+}

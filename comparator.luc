@@ -1,0 +1,25 @@
+module comparator (
+    input in[3][8],
+    input vin,
+    input zin,
+    input nin,
+    //3 inputs for the different v and z and n inputs.
+    //in used to obtain alufn1 and alufn2 inputs
+    //again, remember that in[2][1] = alufn1 in[2][2] = alufn2
+    //in[1] = First Value (8bit)
+    //in[0] = Second Value (8bit)
+    //in[2] = Selector, look only at 0-5.
+    output comparisonresult[8]
+    // = looks at z, requires alufn1=1 alufn2=0
+    // < looks at n xor v, requires alufn1=0 alufn2=1
+    //<= looks at z or (n xor v) requires alufn1=1 alufn2=1
+    
+    //the resultant is (alufn1 AND z) OR ((n xor v) AND alufn2)
+  ) {
+
+  always {
+  comparisonresult[6:0] = 0000000;
+  comparisonresult[7] = (in[2][1] & zin) | ((nin ^ vin) & in[2][2]);
+    
+  }
+}

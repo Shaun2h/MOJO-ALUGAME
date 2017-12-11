@@ -1,0 +1,95 @@
+module bitshiftleft (
+    input in[3][8],
+    output out[8]
+  ) {
+//hardcode works best here instead of doing a general gate logic. I mean if you want to, go ahead though it would work better...
+  //i don't have brain juice left to figure out gate logic.
+  //remember! multiplication is a leftshift in bits.
+  //io_dip[2] = alufn
+  // io_dip[1] = first number
+  // io_dip [0] = second number
+  always {
+  out =00000000;
+    //again just placed to prevent error during complile. Lower statements take priority.
+    if(in[0][2:0] == d0){
+    out[7] = in[1][7];
+    out[6] = in[1][6];
+    out[5] = in[1][5];
+    out[4] = in[1][4];
+    out[3] = in[1][3];
+    out[2] = in[1][2];
+    out[1] = in[1][1];
+    out[0] = in[1][0];      
+    }
+    if(in[0][2:0] == d1){
+    out[7] = in[1][6];
+    out[6] = in[1][5];
+    out[5] = in[1][4];
+    out[4] = in[1][3];
+    out[3] = in[1][2];
+    out[2] = in[1][1];
+    out[1] = in[1][0];
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d2){
+    out[7] = in[1][5];
+    out[6] = in[1][4];
+    out[5] = in[1][3];
+    out[4] = in[1][2];
+    out[3] = in[1][1];
+    out[2] = in[1][0];
+    out[1] = 0;
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d3){
+    out[7] = in[1][4];
+    out[6] = in[1][3];
+    out[5] = in[1][2];
+    out[4] = in[1][1];
+    out[3] = in[1][0];
+    out[2] = 0;
+    out[1] = 0;
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d4){
+    out[7] = in[1][3];
+    out[6] = in[1][2];
+    out[5] = in[1][1];
+    out[4] = in[1][0];
+    out[3] = 0;
+    out[2] = 0;
+    out[1] = 0;
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d5){
+    out[7] = in[1][2];
+    out[6] = in[1][1];
+    out[5] = in[1][0];
+    out[4] = 0;
+    out[3] = 0;
+    out[2] = 0;
+    out[1] = 0;
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d6){
+    out[7] = in[1][1];
+    out[6] = in[1][0];
+    out[5] = 0;
+    out[4] = 0;
+    out[3] = 0;
+    out[2] = 0;
+    out[1] = 0;
+    out[0] = 0;
+      }
+    if(in[0][2:0] == d7){
+    out[7] = in[1][0];
+    out[6] = 0;
+    out[5] = 0;
+    out[4] = 0;
+    out[3] = 0;
+    out[2] = 0;
+    out[1] = 0;
+    out[0] = 0;
+      }
+  }
+}

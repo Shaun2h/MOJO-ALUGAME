@@ -1,0 +1,353 @@
+module discerninput (
+    input buttonnumber[4],
+    input gametype[2],
+    //00=not 10=nand 11=xnor 01=xor
+    input ytype,
+    output answera[8], //to operate on a with
+    output answerb[8] //to operate on b with
+  ) {
+
+  always {
+  answera =8b00000000;    //TO BE OVERWRITTEN
+      answerb =8b00000000; //TO BE OVERWRITTEN
+   case(gametype){
+      2b00:    case (buttonnumber){//NOT
+          4b0000:
+          answera = 8b11001000;
+          answerb = 8b00000000;
+            
+          4b0001:
+          answera =8b11100100;
+          answerb = 8b00000000;
+            
+          4b0010:
+          answera =8b01110010;
+          answerb = 8b00000000;
+            
+          4b0011:
+          answera =8b00110001;
+          answerb = 8b00000000;
+            
+          4b0100:
+          answera =8b10001100;
+          answerb = 8b10000000;
+            
+          4b0101:
+          answera =8b01001110;
+          answerb = 8b01000000;
+            
+          4b0110:
+          answera =8b00100111;
+          answerb = 8b00100000;
+            
+          4b0111:
+          answera =8b00010011;
+          answerb = 8b00010000;
+            
+          4b1000:
+          answera =8b00001000;
+          answerb = 8b11001000;
+            
+          4b1001:
+          answera =8b00000100;
+          answerb = 8b11100100;
+            
+          4b1010:
+          answera =8b00000010;
+          answerb = 8b01110010;
+            
+          4b1011:
+          answera =8b00000001;
+          answerb = 8b00110001;
+            
+          4b1100:
+          answera =8b00000000;
+          answerb = 8b10001100;
+            
+          4b1101:
+          answera =8b00000000;
+          answerb = 8b01001110;
+            
+          4b1110:
+          answera =8b00000000;
+          answerb = 8b00100111;
+            
+          4b1111:
+          answera =8b00000000;
+          answerb = 8b00010011;
+
+    }
+      
+      2b10:    
+          case (buttonnumber){//NAND
+          4b0000:
+          answera =8b01001000;
+          answerb = 8b00000000;
+            
+          4b0001:
+          answera =8b10100100;
+          answerb = 8b00000000;
+            
+          4b0010:
+          answera =8b01010010;
+          answerb = 8b00000000;
+            
+          4b0011:
+          answera =8b00100001;
+          answerb = 8b00000000;
+            
+          4b0100:
+          answera =8b10000100;
+          answerb = 8b10000000;
+            
+          4b0101:
+          answera =8b01001010;
+          answerb = 8b01000000;
+            
+          4b0110:
+          answera =8b00100101;
+          answerb = 8b00100000;
+            
+          4b0111:
+          answera =8b00010010;
+          answerb = 8b00010000;
+            
+          4b1000:
+          answera =8b00001000;
+          answerb = 8b01001000;
+            
+          4b1001:
+          answera =8b00000100;
+          answerb = 8b10100100;
+            
+          4b1010:
+          answera =8b00000010;
+          answerb = 8b01010010;
+            
+          4b1011:
+          answera =8b00000001;
+          answerb = 8b00100000;
+            
+          4b1100:
+          answera =8b00000000;
+          answerb = 8b10000100;
+            
+          4b1101:
+          answera =8b00000000;
+          answerb = 8b01001010;
+            
+          4b1110:
+          answera =8b00000000;
+          answerb = 8b00100101;
+            
+          4b1111:
+          answera =8b00000000;
+          answerb = 8b00010010;
+
+      }
+        
+      2b11:  case(ytype){
+          1b0:        case (buttonnumber){//XNOR
+          4b0000:
+          answera =8b11001000;
+          answerb = 8b00000000;
+            
+          4b0001:
+          answera =8b11100100;
+          answerb = 8b00000000;
+            
+          4b0010:
+          answera =8b01110010;
+          answerb = 8b00000000;
+            
+          4b0011:
+          answera =8b00110001;
+          answerb = 8b00000000;
+            
+          4b0100:
+          answera =8b10001100;
+          answerb = 8b10000000;
+            
+          4b0101:
+          answera =8b01001110;
+          answerb = 8b01000000;
+            
+          4b0110:
+          answera =8b00100111;
+          answerb = 8b00100000;
+            
+          4b0111:
+          answera =8b00010011;
+          answerb = 8b00010000;
+            
+          4b1000:
+          answera =8b00001000;
+          answerb = 8b11001000;
+            
+          4b1001:
+          answera =8b00000100;
+          answerb = 8b11100100;
+            
+          4b1010:
+          answera =8b00000010;
+          answerb = 8b01110010;
+            
+          4b1011:
+          answera =8b00000001;
+          answerb = 8b00110001;
+            
+          4b1100:
+          answera =8b00000000;
+          answerb = 8b10001100;
+            
+          4b1101:
+          answera =8b00000000;
+          answerb = 8b01001110;
+            
+          4b1110:
+          answera =8b00000000;
+          answerb = 8b00100111;
+            
+          4b1111:
+          answera =8b00000000;
+          answerb = 8b00010011;
+         
+      }     
+
+          1b1:        case (buttonnumber){//XNOR
+          4b0000:
+          answera =8b01111111;
+          answerb = 8b11111111;
+            
+          4b0001:
+          answera =8b10111111;
+          answerb = 8b11111111;
+            
+          4b0010:
+          answera =8b11011111;
+          answerb = 8b11111111;
+            
+          4b0011:
+          answera =8b11101111;
+          answerb = 8b11111111;
+            
+          4b0100:
+          answera =8b11110111;
+          answerb = 8b11111111;
+            
+          4b0101:
+          answera =8b11111011;
+          answerb = 8b11111111;
+            
+          4b0110:
+          answera =8b11111101;
+          answerb = 8b11111111;
+            
+          4b0111:
+          answera =8b11111110;
+          answerb = 8b11111111;
+            
+          4b1000:
+          answera =8b11111111;
+          answerb = 8b01111111;
+            
+          4b1001:
+          answera =8b11111111;
+          answerb = 8b10111111;
+            
+          4b1010:
+          answera =8b11111111;
+          answerb = 8b11011111;
+            
+          4b1011:
+          answera =8b11111111;
+          answerb = 8b11101111;
+            
+          4b1100:
+          answera =8b11111111;
+          answerb = 8b11110111;
+            
+          4b1101:
+          answera =8b11111111;
+          answerb = 8b11111011;
+            
+          4b1110:
+          answera =8b11111111;
+          answerb = 8b11111101;
+            
+          4b1111:
+          answera =8b11111111;
+          answerb = 8b11111110;
+         
+      }     
+      }
+      2b01:
+      case (buttonnumber){//XOR
+          4b0000:
+          answera =8b01001000;
+          answerb = 8b00000000;
+            
+          4b0001:
+          answera =8b10100100;
+          answerb = 8b00000000;
+            
+          4b0010:
+          answera =8b01010010;
+          answerb = 8b00000000;
+            
+          4b0011:
+          answera =8b00100001;
+          answerb = 8b00000000;
+            
+          4b0100:
+          answera =8b10000100;
+          answerb = 8b10000000;
+            
+          4b0101:
+          answera =8b01001010;
+          answerb = 8b01000000;
+            
+          4b0110:
+          answera =8b00100101;
+          answerb = 8b00100000;
+            
+          4b0111:
+          answera =8b00010010;
+          answerb = 8b00010000;
+            
+          4b1000:
+          answera =8b00001000;
+          answerb = 8b01001000;
+            
+          4b1001:
+          answera =8b00000100;
+          answerb = 8b10100100;
+            
+          4b1010:
+          answera =8b00000010;
+          answerb = 8b01010010;
+            
+          4b1011:
+          answera =8b00000001;
+          answerb = 8b00100001;
+            
+          4b1100:
+          answera =8b00000000;
+          answerb = 8b10000100;
+            
+          4b1101:
+          answera =8b00000000;
+          answerb = 8b01001010;
+            
+          4b1110:
+          answera =8b00000000;
+          answerb = 8b00100101;
+            
+          4b1111:
+          answera =8b00000000;
+          answerb = 8b00010010;
+            
+      }    
+    }
+  }
+}

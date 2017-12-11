@@ -1,0 +1,35 @@
+module countertype #(
+    SIZE = 25 : SIZE > 0, // Width of the output
+    DIV = 0  : DIV >= 0, // number of bits to use as divisor
+    TOP = 0  : TOP >= 0, // max value, 0 = none
+    
+    // direction to count, use 1 for up and 0 for down
+    UP = 0 : UP == 1 || UP == 0
+  )(
+    input clk,
+    input rst,
+    output value[SIZE]
+  ) {
+  
+  .clk(clk), .rst(rst) {
+    dff ctr[SIZE+DIV];
+  }
+  
+  const MAX_VALUE = c{TOP, DIVx{1}}; // value when maxed out
+  
+  always {
+    value = ctr.q[SIZE+DIV-1-:SIZE]; // set the output
+    
+    if (UP) { // when this is an up counter
+      ctr.d = ctr.q + 1; // increase
+      if (TOP != 0 && ctr.q == MAX_VALUE) { // reached the top?
+        ctr.d = 0; // reset
+      }
+    } else { // down counter
+      ctr.d = ctr.q - 1; // decrease
+      if (TOP != 0 && ctr.q == 0) { // reached the bottom?
+        ctr.d = MAX_VALUE; // reset to top
+      }
+    }
+  }
+}

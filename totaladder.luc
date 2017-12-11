@@ -1,0 +1,45 @@
+module totaladder (
+    input in[3][8],
+    output answer[8],
+    output zout,
+    //when output is all zero
+    output vout,
+    //when output overflows
+    output nout
+    //when output is negative.
+       //in[1] = First Value (8bit)
+    //in[0] = Second Value (8bit)
+    //in[2] = Selector, look only at 0-5.
+  ) {
+  adder firstbit(.binaryone(in[1][0]), .binarytwo( in[2][0]^in[0][0]), .carryin(in[2][0]));
+  //all adders for different bits. Least Significant bit uses ALUFN0 as carry in. 
+  // Note that XOR is applied to all second number inputs. This is to invert, and the one is added in first bit adder.
+  adder secondbit(.binaryone(in[1][1]), .binarytwo( in[2][0]^in[0][1]), .carryin(firstbit.carryout));
+  adder thirdbit(.binaryone(in[1][2]), .binarytwo( in[2][0]^in[0][2]), .carryin(secondbit.carryout));
+  adder fourthbit(.binaryone(in[1][3]), .binarytwo( in[2][0]^in[0][3]), .carryin(thirdbit.carryout));
+  adder fifthbit(.binaryone(in[1][4]), .binarytwo( in[2][0]^in[0][4]), .carryin(fourthbit.carryout));
+  adder sixthbit(.binaryone(in[1][5]), .binarytwo( in[2][0]^in[0][5]), .carryin(fifthbit.carryout));
+  adder seventhbit(.binaryone(in[1][6]), .binarytwo( in[2][0]^in[0][6]), .carryin(sixthbit.carryout));
+  adder eigthbit(.binaryone(in[1][7]), .binarytwo( in[2][0]^in[0][7]), .carryin(seventhbit.carryout));  
+  always {  
+    zout = ~(firstbit.sumout | secondbit.sumout | thirdbit.sumout | fourthbit.sumout | fifthbit.sumout | sixthbit.sumout | seventhbit.sumout | eigthbit.sumout);
+    //NOR all sumouts
+
+    vout = (in[0][0] & in[1][0] & ~(eigthbit.sumout)) | (~(in[0][0]) & ~(in[1][0]) & eigthbit.sumout) ;
+    //Again, all in numbering is changed to having switch 0 be most significant for human reading.
+    //condition is checked by looking at most significant bit, and seeing if a change has occurred. a change would indicate overflow.
+    
+    nout = eigthbit.sumout;
+    //to see if negative, look purely at the first bit. all inputs are signed anyway.
+    
+    answer[0] = firstbit.sumout;
+    answer[1] = secondbit.sumout;
+    answer[2] = thirdbit.sumout;
+    answer[3] = fourthbit.sumout;
+    answer[4] = fifthbit.sumout;
+    answer[5] = sixthbit.sumout;
+    answer[6] = seventhbit.sumout;
+    answer[7] = eigthbit.sumout;
+    //assign the 8bit answer out.
+  }
+}

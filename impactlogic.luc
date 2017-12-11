@@ -1,0 +1,308 @@
+module impactlogic (
+    input clk,  // clock
+    input rst,  // reset
+    input nandmake, //typeselect 3  --
+    input notmake, //typeselect 2  --
+    input xormake, //typeselect 1  --
+    input xnormake, //typeselect 0  --
+    output isnand,
+    output isnot,
+    output isxor,
+    output isxnor,
+    input typechangepress, //there was indeed a game type change pressed.
+    input matrixselection[4], //what of the matrix was chosen...
+    output matrixoutput[16], //current matrix
+    input matrixdo //Something has been selected. prepare for matrix operation.
+    
+  ) {
+    dff nanddet(.clk(clk),.rst(rst)); //store which value is occurring in a register.
+    dff notdet(.clk(clk),.rst(rst)); //store which value is occurring in a register.
+    dff xordet(.clk(clk),.rst(rst)); //store which value is occurring in a register. 
+    dff xnordet(.clk(clk),.rst(rst));  //store which value is occurring in a register.
+
+    countertype mystery(.clk(clk)); //will it work? will it not? who knows?
+     
+    lookintoy looksee; //Utility tool for seeing selected bit's current value.
+  
+    discerninput aha; //Utility tool for obtaining the operands for operating on..
+  
+    alumod alu;    
+  
+    fsm gametype(.clk(clk),.rst(rst)) = {NULL,NAND,XNOR,XOR,NOT};
+    fsm mainstate(.clk(clk),.rst(rst)) = {IDLE,SETUP,INGAME, STEPONE, STEPTWO,WINCHECK0,WINCHECK1,WINCHECK2,WINCHECK3,END1,END2,END2B,END3,END4,END4B, END5, END6};
+    dff arraya[8](.clk(clk),.rst(rst));  
+    dff arrayb[8](.clk(clk),.rst(rst));
+  
+    dff operandone[8](.clk(clk),.rst(rst));
+    dff operandtwo[8](.clk(clk),.rst(rst));  
+    dff alufnstorage[8](.clk(clk),.rst(rst));
+    dff compareeq1[8](.clk(clk),.rst(rst));
+    dff compareeq2[8](.clk(clk),.rst(rst));
+  
+    sig aluholder[3][8];//holds the values for alu inputs.
+    
+    sig tray[2][8]; //a tray to hold both arrays, allowing for a quick lookup for current value
+  //of selected bit.
+  
+  
+  always {
+    isnand=nanddet.q;  //output relevant current typing.
+    isnot=notdet.q;//output relevant current typing.
+    isxnor=xnordet.q;//output relevant current typing.
+    isxor=xordet.q;//output relevant current typing.
+    
+    aha.buttonnumber =4b0000;
+    aha.gametype = 2b00; //default values...
+    aha.ytype=0;
+    
+    aluholder[0] = 8b00000000;
+    aluholder[1] = 8b00000000;  //default trash value for alu...
+    aluholder[2] = 8b00000000;
+    
+    alu.inne = aluholder;  //default trash value to alu assigned
+    
+    
+    mystery.rst = 0; //it is a mystery.
+    
+    
+    tray[0][7] = arraya.q[0];
+    tray[0][6] = arraya.q[1];
+    tray[0][5] = arraya.q[2];
+    tray[0][4] = arraya.q[3];
+    tray[0][3] = arraya.q[4];
+    tray[0][2] = arraya.q[5];
+    tray[0][1] = arraya.q[6];
+    tray[0][0] = arraya.q[7];
+    tray[1][7] = arrayb.q[0];
+    tray[1][6] = arrayb.q[1];
+    tray[1][5] = arrayb.q[2];
+    tray[1][4] = arrayb.q[3];
+    tray[1][3] = arrayb.q[4];
+    tray[1][2] = arrayb.q[5];
+    tray[1][1] = arrayb.q[6];
+    tray[1][0] = arrayb.q[7];
+    
+    //tray[0] = arrayb.q; //consistently have an input ready for y value lookup.
+    
+    looksee.tray = tray; //connect that input...
+    
+    looksee.buttonpick = matrixselection; //obtain selection value..
+    
+    matrixoutput =c{arraya.q,arrayb.q}; //arraya+arrayb = output...
+    
+    //admittedly it's in the reverse order, but if it doesn't impact anything...
+    
+    
+    case(typechangepress){ //Upon receiving a typechange instantly reset progress. Top priority
+      0: nanddet.d=nanddet.q; //needless instruction
+      1: if(nandmake==1){nanddet.d=b1; notdet.d=b0; xnordet.d=b0; xordet.d=b0;gametype.d=gametype.NAND;mainstate.d = mainstate.SETUP;}
+         if(notmake==1){nanddet.d=b0; notdet.d=b1; xnordet.d=b0; xordet.d=b0;gametype.d=gametype.NOT;mainstate.d = mainstate.SETUP;}
+         if(xnormake==1){nanddet.d=b0; notdet.d=b0; xnordet.d=b1; xordet.d=b0;gametype.d=gametype.XNOR;mainstate.d = mainstate.SETUP;}
+         if(xormake==1){nanddet.d=b0; notdet.d=b0; xnordet.d=b0; xordet.d=b1;gametype.d=gametype.XOR; mainstate.d = mainstate.SETUP;}
+        
+        //INITIALISE THE APPROPRIATE GAME MODE, AND STORE EXISTING GAME MODE IN A FLIPFLOP FOR OUTPUT.
+        //THEN, MOVE THE MAINSTATE.SETUP, WHERE WE BEGIN MAGIC.
+      }
+    case(mainstate.q){
+      mainstate.IDLE:nanddet.d=nanddet.q; //do nothing. You're idling really.;
+      mainstate.SETUP:    
+      case(gametype.q){
+        gametype.XNOR:
+          arraya.d = 8b10010101;//Load some preset puzzle.
+          arrayb.d = 8b01110101;
+          mainstate.d = mainstate.INGAME;
+        gametype.XOR: 
+          arraya.d = 8b10110000;//Load some preset puzzle.
+          arrayb.d = 8b00000001;
+          mainstate.d = mainstate.INGAME;
+          
+        gametype.NOT:              
+          arraya.d= 8b01101011; //Load some preset puzzle.
+          arrayb.d = 8b11100100;
+          mainstate.d = mainstate.INGAME;
+            
+        gametype.NAND:
+          arraya.d = 8b00000000;
+          arrayb.d = 8b00001000;   //Load some preset puzzle.
+          mainstate.d = mainstate.INGAME;
+            
+             //The setup phase is complete. move to next phase.
+      }
+        
+        
+        
+    mainstate.INGAME:    //In an actual game, what happens.
+      case(gametype.q){
+          gametype.XNOR:
+            case(matrixdo){ //received a selection!
+              0:nanddet.d=nanddet.q;//do nothing. You're idling really.;
+              
+                
+              1://received a selection! 
+              looksee.buttonpick=matrixselection; //just in case mojo doesn't take the buttonpick..
+              aha.ytype = looksee.out;//place in valid y value...
+              aha.gametype = 2b11; //Xnor is 10
+              aha.buttonnumber = matrixselection; //place in the valid button!
+              
+              if(looksee.out){
+                alufnstorage.d = 6b011000;
+                operandone.d = aha.answera;
+                operandtwo.d = aha.answerb;
+                  } //utilise xor again.
+                else{
+                alufnstorage.d = 6b010110;
+                operandone.d = aha.answera; //operate this with a
+                operandtwo.d = aha.answerb; //operate this with b              
+                 //utilise AND
+                }
+              mainstate.d = mainstate.STEPONE;
+              }
+          
+          gametype.XOR:
+            case(matrixdo){
+              0:nanddet.d=nanddet.q;//do nothing. You're idling really.;
+              
+                
+              1://received a selection!
+              looksee.buttonpick=matrixselection; //just in case mojo doesn't take the buttonpick..
+              aha.ytype = looksee.out;//place in valid y value...
+              aha.gametype = 2b01; //xor is 11..
+              aha.buttonnumber = matrixselection; //place in the valid button!
+              if(looksee.out){
+                alufnstorage.d = 6b010110;//do nothing if it was a 1 that was selected.
+                operandone.d = aha.answera; //operate this with a
+                operandtwo.d = aha.answerb; //operate this with b                  
+                  } //xor if it was a 0 that was selected.
+                else{
+                operandone.d =8b00000000;
+                operandtwo.d =8b00000000;
+                alufnstorage.d = 6b011010;
+                                                
+                  }
+              mainstate.d = mainstate.STEPONE;
+              }            
+          
+          gametype.NOT:
+            case(matrixdo){
+              0:nanddet.d=nanddet.q;//do nothing. You're idling really.;
+              
+                
+              1://received a selection!
+              looksee.buttonpick=matrixselection; //just in case mojo doesn't take the buttonpick..
+              aha.ytype = looksee.out;//place in valid y value...
+              aha.gametype = 2b00; //NOT is 00
+              aha.buttonnumber = matrixselection; //place in the valid button!
+              operandone.d = aha.answera; //operate this with a
+              operandtwo.d = aha.answerb; //operate this with b
+              alufnstorage.d = 6b010110; //USE XOR AGAIN. YES THIS USES XOR TOO.
+              mainstate.d = mainstate.STEPONE;
+              
+              }            
+              
+          gametype.NAND:  
+            case(matrixdo){
+              0:nanddet.d=nanddet.q;//do nothing. You're idling really.;
+              
+                
+              1://received a selection!
+              looksee.buttonpick=matrixselection; //just in case mojo doesn't take the buttonpick..
+              aha.ytype = looksee.out;//place in valid y value...
+              aha.gametype = 2b10; //nand is 10
+              aha.buttonnumber = matrixselection; //place in the valid button!
+              operandone.d = aha.answera; //operate this with a
+              operandtwo.d = aha.answerb; //operate this with b
+              if(looksee.out){
+              alufnstorage.d = 6b010110; //USE XOR. AGAIN. no other way.
+              mainstate.d = mainstate.STEPONE;
+                }
+                else{
+              alufnstorage.d = 6b011110; //USE OR, set everything around this node to 1.
+              mainstate.d = mainstate.STEPONE;                
+                }
+              }            
+            
+            
+          }  
+      mainstate.STEPONE:
+        aluholder[0] = arraya.q;
+        aluholder[1] = operandone.q; //generate input to alufn..
+        aluholder[2] = alufnstorage.q;
+        
+        alu.inne = aluholder; //calculate
+        
+        arraya.d = alu.out; //update array a 
+        
+        mainstate.d = mainstate.STEPTWO; // go to next calculation for second array.
+        
+        
+      mainstate.STEPTWO:
+        
+        aluholder[0] = arrayb.q;
+        aluholder[1] = operandtwo.q;  //generate inputs
+        aluholder [2] = alufnstorage.q;
+        
+        alu.inne = aluholder; //calculate
+        arrayb.d = alu.out; //update array b
+        
+        
+        mainstate.d = mainstate.WINCHECK0;       //move to wincheck movements.
+        
+      mainstate.WINCHECK0:
+        alufnstorage.d = 6b110011;
+        operandone.d = 8b11111111;      //GET READY FOR CMPEQ WITH 11111111.
+        operandtwo.d = 8b11111111;        
+        mainstate.d = mainstate.WINCHECK1;
+        
+      mainstate.WINCHECK1:
+        aluholder[0]=arraya.q;
+        aluholder[1] = operandone.q;
+        aluholder[2] = alufnstorage.q;  //PERFORM CMPEQ
+        alu.inne = aluholder;
+        compareeq1.d = alu.out;
+        mainstate.d = mainstate.WINCHECK2;
+        
+      mainstate.WINCHECK2:
+        aluholder[0]=arrayb.q;
+        aluholder[1] = operandtwo.q;
+        aluholder[2] = alufnstorage.q; //PERFORM CMPEQ
+        alu.inne = aluholder;
+        compareeq2.d = alu.out;
+        mainstate.d = mainstate.WINCHECK3;
+
+      mainstate.WINCHECK3:
+      if(compareeq1.q){
+        if(compareeq2.q){mainstate.d = mainstate.END1;} //IF CMPEQ RETURNS 1 FOR BOTH CHECKS, YOU HAVE WON THE GAME
+          else{mainstate.d = mainstate.INGAME;}
+            }
+        else{mainstate.d = mainstate.INGAME;}
+     mainstate.END1:
+        
+        mystery.rst=1;   //reset clock to initiate countdown
+        arraya.d=8b0; //off all lights.
+        arrayb.d=8b0;
+        mainstate.d = mainstate.END2; //proceed
+        
+      mainstate.END2:
+        if(mystery.value ==26b1){arraya.d=8b11111111; arrayb.d=8b11111111;mainstate.d=mainstate.END3; mystery.rst=1;}
+        else{mainstate.d = mainstate.END2;}
+        
+      mainstate.END3:
+        if(mystery.value==26b1){arraya.d=8b00000000; arrayb.d = 8b00000000; mainstate.d = mainstate.END4; mystery.rst=1;}
+        else{mainstate.d = mainstate.END3;}
+      
+      mainstate.END4:
+        if(mystery.value ==26b1){arraya.d=8b11111111; arrayb.d=8b11111111;mainstate.d=mainstate.END5; mystery.rst=1;}
+        else{mainstate.d = mainstate.END4;}
+        
+      mainstate.END5:
+        if(mystery.value==26b1){arraya.d=8b00000000; arrayb.d = 8b00000000; mainstate.d = mainstate.IDLE; mystery.rst=1;}
+        else{mainstate.d = mainstate.END5;}
+    }    
+
+
+    
+    
+    
+    
+  }
+}

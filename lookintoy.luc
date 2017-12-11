@@ -1,0 +1,28 @@
+module lookintoy (
+    input tray[2][8],
+    input buttonpick[4],
+    output out
+  ) {
+
+  always {
+    out=0;
+    case(buttonpick){
+    b0000:out = tray[0][0];
+    b0001:out = tray[0][1];
+    b0010:out = tray[0][2];
+    b0011:out = tray[0][3];
+    b0100:out = tray[0][4];
+    b0101:out = tray[0][5];
+    b0110:out = tray[0][6];
+    b0111:out = tray[0][7];                //ALL TO SELECT WHATEVER THE RELEVANT BIT IS....
+    b1000:out = tray[1][0];
+    b1001:out = tray[1][1];
+    b1010:out = tray[1][2];
+    b1011:out = tray[1][3];
+    b1100:out = tray[1][4];
+    b1101:out = tray[1][5];
+    b1110:out = tray[1][6];
+    b1111:out = tray[1][7];
+    }
+  }
+}
