@@ -14,6 +14,7 @@ module impactlogic (
     output matrixoutput[16], //current matrix
     input matrixdo //Something has been selected. prepare for matrix operation.
     
+    
   ) {
     dff nanddet(.clk(clk),.rst(rst)); //store which value is occurring in a register.
     dff notdet(.clk(clk),.rst(rst)); //store which value is occurring in a register.
@@ -108,12 +109,12 @@ module impactlogic (
       mainstate.SETUP:    
       case(gametype.q){
         gametype.XNOR:
-          arraya.d = 8b10010101;//Load some preset puzzle.
-          arrayb.d = 8b01110101;
+          arraya.d = 8b10000000;//Load some preset puzzle.
+          arrayb.d = 8b00000000;
           mainstate.d = mainstate.INGAME;
         gametype.XOR: 
-          arraya.d = 8b10110000;//Load some preset puzzle.
-          arrayb.d = 8b00000001;
+          arraya.d = 8b00111110;//Load some preset puzzle.
+          arrayb.d = 8b00010011;
           mainstate.d = mainstate.INGAME;
           
         gametype.NOT:              
@@ -122,8 +123,8 @@ module impactlogic (
           mainstate.d = mainstate.INGAME;
             
         gametype.NAND:
-          arraya.d = 8b00000000;
-          arrayb.d = 8b00001000;   //Load some preset puzzle.
+          arraya.d = 8b00001010;
+          arrayb.d = 8b11011110;   //Load some preset puzzle.
           mainstate.d = mainstate.INGAME;
             
              //The setup phase is complete. move to next phase.
@@ -306,3 +307,10 @@ module impactlogic (
     
   }
 }
+/*    case(gametype.q){
+        gametype.NULL: nanddet.d=nanddet.q; //do nothing.
+        gametype.XNOR: nanddet.d=nanddet.q; //do nothing.;
+        gametype.XOR:nanddet.d=nanddet.q; //do nothing.
+        gametype.NOT:nanddet.d=nanddet.q; //do nothing.
+        gametype.NAND:nanddet.d=nanddet.q; //do nothing.
+      }*/
